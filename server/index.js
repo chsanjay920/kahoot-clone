@@ -49,7 +49,14 @@ io.on('connection', socket => {
         io.to(master.Socket.id).emit("answers", details);
     });
 });
-app.use(cors());
+const corsOptions = {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  };
+  const corsMiddleware = cors(corsOptions);
+app.use(corsMiddleware);
+
 app.use(bodyParser.json());
 // Handle file upload and conversion
 app.post('/upload', upload.single('file'), (req, res) => {
