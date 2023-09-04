@@ -1,0 +1,39 @@
+[
+    {
+        "timestamp": "2023-09-03T17:01:54.330Z",
+        "QuizzId": "d274a367-7e4c-4697-af56-9ef0d551f011",
+        "data": {
+            "title": "hellow",
+            "description": "kajsfajfn",
+            "questions": [
+                {
+                    "question": "how are you?",
+                    "option1": "good",
+                    "option2": "bad",
+                    "option3": "feeling sad",
+                    "option4": "fine",
+                    "answer": "a",
+                    "interval": 15
+                },
+                {
+                    "question": "how is food?",
+                    "option1": "good",
+                    "option2": "bad",
+                    "option3": "feeling sad",
+                    "option4": "fine",
+                    "answer": "a",
+                    "interval": 20
+                },
+                {
+                    "question": "how is your family?",
+                    "option1": "good",
+                    "option2": "bad",
+                    "option3": "feeling sad",
+                    "option4": "fine",
+                    "answer": "a",
+                    "interval": 25
+                }
+            ]
+        }
+    }
+]
