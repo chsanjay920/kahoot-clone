@@ -1,4 +1,4 @@
-const apiUrl = 'https://kahoot-server.onrender.com';
+const apiUrl = 'http://localhost:8000';
 const socket = io(apiUrl);
 
 var gamecode = document.getElementById("gamepin");
@@ -8,7 +8,7 @@ var codediv= document.getElementById("GameCodeDiv");
 var namediv = document.getElementById("namediv");
 var questionsDiv = document.getElementById("questionsDiv");
 var waitingDiv = document.getElementById("waiting");
-
+var resultdiv = document.getElementById('resultdiv');
 
 var questionNumber = document.getElementById("questionNumber");
 var question = document.getElementById("question");
@@ -23,6 +23,15 @@ var progressBar = document.getElementById("progressbar");
 var clientDetailes = {
     name:"",
     gamecode:""
+}
+
+function hideAllDivs()
+{
+    codediv.style.display = "none";
+    namediv.style.display = "none";
+    questionsDiv.style.display = "none";
+    waitingDiv.style.display = "none";
+    resultdiv.style.display = "none";
 }
 
 function GameCodeSubmit()
@@ -55,7 +64,26 @@ socket.on('getQuestion', data=>{
     console.log("question incomming");
     displayQuestions(data);
 });
+socket.on('overAllResult',report=>{
+    console.log("over all result ");
+    console.log(report);
+    listResult(report.list);
+});
 
+function listResult(list)
+{
+    hideAllDivs();
+    resultdiv.style.display="block";
+    var result = `<div class="list-group list-group-numbered">`;
+    list.forEach(element => {
+        var listitem = `<div class="list-group-item">${element.name} scored ${element.score}</div>`
+        result+=listitem;
+    });
+    result +=`</div>`
+    var resultcontainer = document.createElement("div");
+    resultcontainer.innerHTML = result;
+    document.getElementById("resultdiv").appendChild(resultcontainer);
+}
 
 function displayQuestions(Data)
 {
@@ -71,7 +99,7 @@ function displayQuestions(Data)
     option2.innerHTML = `${Data.option2}`;
     option3.innerHTML = `${Data.option3}`;
     option4.innerHTML = `${Data.option4}`;
-    fillProgressBar(Data.interval*1000+2000,()=>{
+    fillProgressBar(Data.interval*1000,()=>{
         selectedAnswer()
     });
 }

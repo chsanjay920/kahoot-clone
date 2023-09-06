@@ -22,7 +22,7 @@
                     <div class="btn btn-secondary my-2">
                         dashboard
                     </div>
-                    <div class="btn btn-secondary my-2">
+                    <div class="btn btn-secondary my-2" onclick="displayReports()">
                         REPORT
                     </div>
                     <div class="btn btn-secondary my-2">
@@ -144,11 +144,19 @@
                     </div>
 
                 </div>
+                <!-- quiz start div -->
                 <div class="startQuiz mt-5" id="startQuiz" >
                     <div class="h3 ms-3 text-uppercase" id="startQuizTitle"></div>
                     <div class="ms-3" id="startQuizDescription"></div>
                     <input type="text" name="pin" id="passcode" disabled class="passcode form-control ms-3 w-25 my-2" >
                     <div class="list-group list-group-numbered" id="startedQuestionsList"
+                    style="height: 80vh; overflow-y: auto;">
+                    </div>
+                </div>
+                <div class="reports " id="reports">
+                    <div class="h3 ms-3 text-uppercase" id="reportTitle"></div>
+                    <div class="ms-3" id="reportDescription" ></div>
+                    <div class="list-group list-group-numbered" id="reportList"
                     style="height: 80vh; overflow-y: auto;">
                     </div>
                 </div>

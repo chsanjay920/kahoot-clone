@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/login.css">
+</head>
+<body>
+    <div class="d-flex justify-content-center align-items-center" id="main-container">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="col mt-3 d-flex justify-content-center">
+                        <img src="./images/logo.png" alt="jnet logo" style="height: 80px;">
+                    </div>
+                    <div class="container border mt-5 pt-3 w-75 d-md-flex flex-row justify-content-center bg-light">
+                        <form class="" id="login">
+                            <div class="col mb-3 d-flex justify-content-center">
+                                <h6>Login to your account</h6>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" placeholder="Enter Username"
+                                    aria-describedby="emailHelp">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="clientpassword"
+                                    placeholder="Enter Password">
+                            </div>
+                            <div class="text-center small my-2 ">
+                                <small>
+                                    New User ?
+                                </small>
+                                <small style="color: rgb(50, 166, 255); cursor: pointer;"
+                                    onclick="register()">CreateAccount</small>
+                            </div>
+                            <button type="button" class="btn btn-primary w-100 mb-3" onclick="Userlogin()">Sign In</button>
+                        </form>
+                        <form class="" id="register">
+                            <div class="col  d-flex justify-content-center">
+                                <h6>Register account</h6>
+                            </div>
+                            <div class="mb-1">
+                                <label for="userid" class="form-label">userid</label>
+                                <input type="email" class="form-control" id="userid" placeholder="Enter Username"
+                                    aria-describedby="emailHelp">
+                            </div>
+                            <div class="mb-1">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="rpassword" placeholder="Enter Password">
+                            </div>
+                            <div class="mb-1">
+                                <label for="password" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="cpassword" placeholder="Enter Password">
+                            </div>
+                            <div class="text-center small my-2">
+                                already user ?
+                                <small style="color: rgb(50, 166, 255); cursor: pointer;"
+                                    onclick="showLogin()">login</small>
+                            </div>
+                            <button type="button" onclick="submitregister()" class="btn btn-primary w-100 mb-3">register</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col d-md-block d-none">
+                    <img src="./images/login.svg" alt="login container">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="./js/bootstrap.bundle.min.js"></script>
+<script src="./js/login.js"></script>
+
+</html>

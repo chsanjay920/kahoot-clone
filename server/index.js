@@ -10,20 +10,16 @@ const socketIo = require('socket.io');
 const cors = require('cors');
 const server = http.createServer(app);
 const PORT = process.env.PORT || 8000;
-
-// Create a storage engine using multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-
+let QuizeMasters = {};
 const io = socketIo(server, {
     cors: {
         origin: '*',
         methods: ['GET', 'POST'],
     },
 });
-
-
 app.use(cors());
 app.use(bodyParser.json());
 
@@ -31,8 +27,7 @@ server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
-let QuizeMasters = {};
-
+// web socket events
 io.on('connection', socket => {
     socket.on('sendQuestion', questiondata => {
         console.log("question", questiondata);
@@ -57,13 +52,13 @@ io.on('connection', socket => {
         io.to(master.Socket.id).emit("answers", details);
     });
     socket.on('publishreport',(report)=>{
+        // console.log(">>>>>>report");
         console.log(report);
-        saveReport(report);
+        io.to(`${report.pincode}`).emit("overAllResult",report);
+        // saveReport(report);
     });
 });
-
-
-// Handle file upload and conversion
+// file upload api
 app.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
@@ -79,7 +74,31 @@ app.post('/upload', upload.single('file'), (req, res) => {
         res.status(500).send('Error converting Excel to JSON.');
     }
 });
-// Define a route for handling POST requests
+// user register api 
+app.post('/register',(req, res) => {
+    if (!req.body) {
+        return res.status(400).json({ error: 'No JSON data provided' });
+    }
+    const jsonData = req.body;
+    const filePath = 'userdata.json';
+    fs.readJson(filePath, (err, existingData) => {
+        if (err && err.code !== 'ENOENT') {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to read JSON data' });
+        }
+        const responseData = jsonData;
+        const updatedData = existingData ? [...existingData, responseData] : [responseData];
+        console.log(jsonData);
+        fs.writeJson(filePath, updatedData, (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to save JSON data' });
+            }
+            res.status(200).json({ message: 'JSON data saved successfully' });
+        });
+    });
+});
+// quiz questions api
 app.post('/addQuestion', (req, res) => {
     console.log(req.body);
     if (!req.body) {
@@ -108,6 +127,7 @@ app.post('/addQuestion', (req, res) => {
         });
     });
 });
+// get all Questions
 app.get('/allQuestions', (req, res) => {
     fs.readJson("data.json", (err, existingData) => {
         if (err && err.code !== 'ENOENT') {
@@ -117,6 +137,7 @@ app.get('/allQuestions', (req, res) => {
         res.send(existingData);
     });
 });
+// getting questions by id api
 app.get('/getQuestionsByID/:id', (req, res) => {
     fs.readJson("data.json", (err, existingData) => {
         if (err && err.code !== 'ENOENT') {
@@ -129,8 +150,52 @@ app.get('/getQuestionsByID/:id', (req, res) => {
         });
     });
 });
+// user login api
+app.get('/login/:user', (req, res) => {
+    var user = req.params.user.split("_");
+    var validuser = false;
+    var role = "";
+    fs.readJson("userdata.json", (err, existingData) => {
+        if (err && err.code !== 'ENOENT') {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to read JSON data' });
+        }
+        existingData.forEach(element => {
+            if (element.username == user[0] && element.password == user[1])
+            {
+                validuser = true;   
+                role = element.role;
+            }
+        });
+        if(validuser)
+        {
+            if(role == "admin")
+                res.send({
+                    role:"admin"
+                });
+            else   
+                res.send({
+                    role:"player"
+                })
+        }
+        else
+            res.send({
+                role:"invalid_user"
+            });
+    });
+});
 
+app.get('/getreports',(req,res)=>{
+    fs.readJson("reports.json", (err, existingData) => {
+        if (err && err.code !== 'ENOENT') {
+            console.error(err);
+            return res.status(500).json({ error: 'Failed to read JSON data' });
+        }
+        res.send(existingData);
+    });
+});
 
+// saving reports function
 function saveReport(report)
 {
     try {

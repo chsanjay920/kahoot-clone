@@ -1,4 +1,4 @@
-const apiUrl = 'https://kahoot-server.onrender.com';
+const apiUrl = 'http://localhost:8000';
 const socket = io(apiUrl);
 const fileInput = document.getElementById('file-input');
 const questioslistdiv = document.getElementById("questionsList");
@@ -7,6 +7,7 @@ const questionsRenderingDiv = document.getElementById("questionsRender");
 const quizetimeDiv = document.getElementById("quizetime");
 const createQuestionsDiv = document.getElementById("CreateQuestions");
 const startedQuestionsListdiv = document.getElementById("startQuiz");
+const reportsDiv = document.getElementById("reports");
 
 const question = document.getElementById("question");
 const option1 = document.getElementById("option1");
@@ -58,6 +59,7 @@ function uploadFile() {
     };
     xhr.send(formData);
 }
+// function to render questions on file upload
 function renderQuestions(questionslist) {
     hideAllSections();
     questionsRenderingDiv.style.display = "block";
@@ -111,9 +113,11 @@ function renderQuestions(questionslist) {
         questioslistdiv.appendChild(questiondiv);
     });
 }
+// saving quize
 function saveQuize() {
     showTitleModel();
 }
+// function to clear form
 function clearForm() {
     question.value = "";
     option1.value = "";
@@ -127,6 +131,7 @@ function clearForm() {
     var cells = document.getElementsByClassName("saved-question-cell");
     console.log(cells);
 }
+// function to check validation
 function checkValidation() {
 
     var isanswerselected = false;
@@ -150,6 +155,7 @@ function checkValidation() {
     }
     return true;
 }
+// function to add question
 function addQuestion() {
     if (checkValidation()) {
         var que = {
@@ -166,6 +172,7 @@ function addQuestion() {
         clearForm();
     }
 }
+// function to add new question
 function newQuestion(element) {
     var questiondiv = document.createElement("div");
     questiondiv.classList = ["list-group-item d-flex justify-content-between align-items-start"];
@@ -212,13 +219,16 @@ function newQuestion(element) {
 
     document.getElementById("questionsList2").appendChild(questiondiv);
 }
+// function to show title model
 function showTitleModel() {
     document.getElementById("toggleTitleModel").click();
 }
+// function to show create quiz model
 function ShowCreateQuizModel() {
     hideAllSections();
     createQuestionsDiv.style.display = "block";
 }
+// function to save question
 async function  saveQuestions() {
     if (title.value.length == 0) {
         alert("Title id Required!");
@@ -250,10 +260,13 @@ async function  saveQuestions() {
             console.error('Error:', error);
         });
 }
+// function to hide all sections in main container
 function hideAllSections() {
     questionsRenderingDiv.style.display = "none";
     createQuestionsDiv.style.display = "none";
     quizetimeDiv.style.display = "none";
+    startedQuestionsListdiv.style.display = "none";
+    reportsDiv.style.display = "none";
 }
 // load quizzes data from server
 async function loadSavedQuizes() {
@@ -293,6 +306,7 @@ async function loadSavedQuizes() {
         });
     }))
 }
+// start quiz by it id
 function startQuizeByID(quizID) {
     hideAllSections();
     pincode = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
@@ -306,6 +320,7 @@ function startQuizeByID(quizID) {
         startedQuestionsListRender(response.data.questions);
     }))
 }
+// render quize after quiz started
 function startedQuestionsListRender(questionslist) {
     hideAllSections();
     startedQuestionsListdiv.style.display = "block";
@@ -380,6 +395,7 @@ function startedQuestionsListRender(questionslist) {
         counter++;
     });
 }
+// send questions to players
 function sendQuestionToPlayers(questionNumber) {
     currentQuestionAnswers = [];
     currectQuizMetaData.pincode = pincode;
@@ -390,11 +406,12 @@ function sendQuestionToPlayers(questionNumber) {
     socket.emit('sendQuestion', { data: currentQuize.data.questions[questionNumber], passcode: pincode });
     document.getElementById(`startbtn${questionNumber}`).style.display = "none";
     contr++;
-    fillProgressBar(`progressbar${questionNumber}`, currentQuize.data.questions[questionNumber].interval * 1000 + 3000, () => {
+    fillProgressBar(`progressbar${questionNumber}`, currentQuize.data.questions[questionNumber].interval * 1000 +1000, () => {
         document.getElementById(`question${questionNumber}`).style.backgroundColor = "rgba(220, 220, 220, 0.782)";
         calculateScores(currentQuestionAnswers, currectoption);
     });
 }
+// this function calculate the score
 function calculateScores(arr, currectoption) {
     arr.forEach(element => {
         if (element.selectedoption == currectoption) {
@@ -410,18 +427,20 @@ function calculateScores(arr, currectoption) {
         displayFinalReport(finalReport);
     displayReport(finalReport);
 }
+// this function displays report
 function displayReport(report) {
     var arr = report.sort((a, b) => parseFloat(b.score) - parseFloat(a.score));
     document.getElementById("generalranking").innerHTML = "";
     arr.forEach(e => {
         var div = document.createElement("div");
         div.classList = ['list-group-item']
-        div.innerHTML = e.name;
+        div.innerHTML = "ranked : "+e.name;
         document.getElementById("generalranking").appendChild(div);
     });
     console.log("||", arr);
     document.getElementById("generalToggleBtn").click();
 }
+// this function display final report
 function displayFinalReport(report) {
     var arr = report.sort((a, b) => parseFloat(b.score) - parseFloat(a.score))
     arr.forEach(e => {
@@ -432,8 +451,8 @@ function displayFinalReport(report) {
     });
     document.getElementById("finalTogglebtn").click();
 }
-
- function saveReport() {
+// this function save report
+async function saveReport() {
     var arr = finalReport.sort((a, b) => parseFloat(b.score) - parseFloat(a.score))
     var finalreportObject = {
         pincode :currectQuizMetaData.pincode,
@@ -441,10 +460,9 @@ function displayFinalReport(report) {
         description: currectQuizMetaData.description+" desc",
         list: arr
     }
-    console.log("<<<<<<<",finalreportObject);
-    console.log(finalreportObject);
-    socket.emit("publishreport",finalreportObject);
+    await socket.emit("publishreport",finalreportObject);
 }
+// this function fillprogress bar
 function fillProgressBar(id, duration, callback) {
     var progressBar = document.getElementById(id);
     let startTime = null;
@@ -468,12 +486,26 @@ function fillProgressBar(id, duration, callback) {
     }
     requestAnimationFrame(step);
 }
+// appends player to dashboard when player connects
 function appendPlayer(name) {
     var div = document.getElementById("playersJoiningDetails");
     var listiteam = document.createElement("div");
     listiteam.classList = ["list-group-item"];
     listiteam.innerHTML = `${name} joined game!`;
     div.appendChild(listiteam);
+}
+
+function displayReports()
+{
+    hideAllSections();
+    reportsDiv.style.display = "block";
+    fetch('http://localhost:8000/getreports').then(response=>response.json().then(data=>{
+        const sortedArray = data.sort((a, b) => {
+            return new Date(b.timestamp) - new Date(a.timestamp);
+        });
+        var div = iterateOverObjectsAndAddToAccordion(sortedArray);
+        document.getElementById("reportList").appendChild(div);
+    }));
 }
 loadSavedQuizes();
 
@@ -489,3 +521,42 @@ socket.on('answers', (data) => {
     currentQuestionAnswers.push(data);
 });
 
+
+
+
+function iterateOverObjectsAndAddToAccordion(objects) {
+    var accordionHtml = `<div class="accordion w-70 mt-5 mx-1" id="accordionExample">`;
+    var div = document.createElement("div");
+    let counter = 0;
+    var show = "show"
+    for (var object of objects) {
+        if(counter != 0)
+        show=""
+        var list  = `<div class="list-group">`;
+        object.data.list.forEach(listelement=>{
+            var listitem=  ` <div class="list-group-item">name : ${listelement.name} | correct answers: ${listelement.score}</div>`;
+            list+=listitem;
+        });
+        list += `</div>`
+      var accordionItemHtml = `
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#${counter}" aria-expanded="true" aria-controls="${counter}">
+              ${object.data.title} | pincode :${object.data.pincode}
+            </button>
+          </h2>
+          <div id="${counter}" class="accordion-collapse collapse ${show}" data-bs-parent="#accordionExample">
+            <div class="accordion-body">
+              ${list}
+            </div>
+          </div>
+        </div>
+      `;
+      accordionHtml += accordionItemHtml;
+    counter++;
+    }
+    accordionHtml += `</div>`;
+     div.innerHTML = accordionHtml;
+     return div;
+  }
+  
