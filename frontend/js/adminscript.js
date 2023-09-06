@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:8000';
+const apiUrl = 'https://kahoot-server.onrender.com';
 const socket = io(apiUrl);
 const fileInput = document.getElementById('file-input');
 const questioslistdiv = document.getElementById("questionsList");
