@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script><script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="./css/style.css">
+    <script src="http://localhost:8000/socket.io/socket.io.js"></script>
+    <title>Kahoot! clone</title>
+</head>
+<body class="">
+    <div class="main-container container-fluid d-flex flex-column justify-content-center align-items-center">
+        <div class="SubContainer text-center ">
+            <div class="card mb-3 " style="max-width: 540px;" id="GameCodeDiv">
+                <div class="row g-0">
+                    <div class="card-body">
+                      <h5 class="card-title  text-capitalize">Kahoot!</h5>
+                      <p class="card-text">Enter Kahoot Game PIN</p>
+                      <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="GAME PIN" aria-label="GAME PIN" aria-describedby="basic-addon1" id="gamepin">
+                      </div>
+                      <div class="btn btn-outline-primary w-100" onclick="GameCodeSubmit()">
+                        ENTER
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card mb-3" style="max-width: 540px;" id="namediv">
+                <div class="row g-0">
+                    <div class="card-body">
+                      <h5 class="card-title  text-capitalize">Kahoot!</h5>
+                      <p class="card-text">Enter Your Name!</p>
+                      <div class="input-group mb-3">
+                        <input type="text" class="form-control" placeholder="USERNAME" id="username" aria-label="USERNAME" aria-describedby="basic-addon1">
+                      </div>
+                      <div class="btn btn-outline-primary w-100" onclick="SubmitName()">
+                        ENTER
+                      </div>
+                    </div>
+                </div>
+            </div> 
+            <div class="" id="waiting">
+                <img src="./images/impatient-kitty.gif" alt="waiting image">
+            </div>
+            <div class="bg-light rounded border  " id="questionsDiv">
+                <div class="progress" style="height: 10px; ">
+                    <div class="progress-bar bg-secondary" id="progressbar" ></div>
+                </div>
+                <div class="card text-center p-2" style="width: 80vw; height: auto;">
+                    <div class="card-body ">
+                      <h5 class="card-title" id="question">Question</h5>
+                      <div class="row">
+                        <div class="col mt-3">
+                            <div class="row">
+                                <div class="col btn mx-3 my-1 bg-primary text-light" id="option-1" onclick="PlayerSelectedAnswer('a')">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore, aut!
+                                </div>
+                                <div class="col btn mx-3 my-1 bg-danger text-light" id="option-2" onclick="PlayerSelectedAnswer('b')">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore, aut!
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col btn mx-3 my-1 bg-warning text-light" id="option-3" onclick="PlayerSelectedAnswer('c')">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore, aut!
+                                </div>
+                                <div class="col btn mx-3 my-1 bg-success  text-light" id="option-4" onclick="PlayerSelectedAnswer('d')">
+                                    Lorem ipsum dolor sit amet consectetur adipisicing elit. Inventore, aut!
+                                </div>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body> 
+<script src="./js/script.js"></script>
+</html>

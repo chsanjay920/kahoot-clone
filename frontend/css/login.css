@@ -1,0 +1,13 @@
+*{
+    box-sizing: border-box;
+    padding: 0px;
+    margin: 0px;
+}
+
+body{
+    background-color: rgba(220, 220, 220, 0.782);
+}
+
+#main-container{
+    height: 100vh;
+}

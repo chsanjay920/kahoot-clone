@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>login</title>
+    <link rel="stylesheet" href="./css/bootstrap.min.css">
+    <link rel="stylesheet" href="./css/login.css">
+</head>
+
+<body>
+    <div class="d-flex justify-content-center align-items-center" id="main-container">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="col mt-3 d-flex justify-content-center">
+                        <img src="./images/logo.png" alt="jnet logo" style="height: 80px;">
+                    </div>
+                    <div class="container border mt-5 pt-3 w-75 d-md-flex flex-row justify-content-center bg-light">
+                        <form>
+                            <div class="col mb-3 d-flex justify-content-center">
+                                <h6>Login to your account</h6>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="email" class="form-control" id="username" placeholder="Enter Username"
+                                    aria-describedby="emailHelp">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password"
+                                    placeholder="Enter Password">
+                            </div>
+                            <div class="mb-3 form-check">
+                                <input type="checkbox" class="form-check-input" id="exampleCheck1">
+                                <label class="form-check-label" for="exampleCheck1">
+                                    Remember me on this device
+                                </label>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mb-3">Sign In</button>
+                        </form>
+                    </div>
+                </div>
+                <div class="col d-md-block d-none">
+                    <img src="./images/login.svg" alt="login container">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script src="./js/bootstrap.bundle.min.js"></script>
+
+</html>
