@@ -1,6 +1,6 @@
-const socket = io('http://localhost:8000');
+const apiUrl = 'http://localhost:8000';
+const socket = io(apiUrl);
 const fileInput = document.getElementById('file-input');
-const apiUrl = 'http://localhost:3000';
 const questioslistdiv = document.getElementById("questionsList");
 const startedQuestionsList = document.getElementById("startedQuestionsList");
 const questionsRenderingDiv = document.getElementById("questionsRender");
@@ -18,9 +18,19 @@ const interval = document.getElementById("interval");
 const title = document.getElementById("title");
 const description = document.getElementById("description");
 
+var currentQuize = {};
+var currentQuestionAnswers = [];
+var currectoption = "";
 var pincode = "";
 var QuizQuestion = []
-
+var contr = 0;
+var islastQuestion = false;
+var currectQuizMetaData = {
+    title:"",
+    description:"",
+    pincode:""
+};
+var finalReport = []
 
 fileInput.addEventListener('change', uploadFile);
 // function to click hidden input feild
@@ -48,7 +58,6 @@ function uploadFile() {
     };
     xhr.send(formData);
 }
-
 function renderQuestions(questionslist) {
     hideAllSections();
     questionsRenderingDiv.style.display = "block";
@@ -102,11 +111,9 @@ function renderQuestions(questionslist) {
         questioslistdiv.appendChild(questiondiv);
     });
 }
-
 function saveQuize() {
     showTitleModel();
 }
-
 function clearForm() {
     question.value = "";
     option1.value = "";
@@ -143,7 +150,6 @@ function checkValidation() {
     }
     return true;
 }
-
 function addQuestion() {
     if (checkValidation()) {
         var que = {
@@ -160,7 +166,6 @@ function addQuestion() {
         clearForm();
     }
 }
-
 function newQuestion(element) {
     var questiondiv = document.createElement("div");
     questiondiv.classList = ["list-group-item d-flex justify-content-between align-items-start"];
@@ -214,13 +219,14 @@ function ShowCreateQuizModel() {
     hideAllSections();
     createQuestionsDiv.style.display = "block";
 }
-function saveQuestions() {
-
+async function  saveQuestions() {
     if (title.value.length == 0) {
         alert("Title id Required!");
         return;
     }
-    fetch(`${apiUrl}/addQuestion`, {
+    currectQuizMetaData.title = title.value;
+    currectQuizMetaData.description = description.value;
+    await fetch(`${apiUrl}/addQuestion`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -244,17 +250,15 @@ function saveQuestions() {
             console.error('Error:', error);
         });
 }
-
 function hideAllSections() {
     questionsRenderingDiv.style.display = "none";
     createQuestionsDiv.style.display = "none";
     quizetimeDiv.style.display = "none";
 }
-
 // load quizzes data from server
-function loadSavedQuizes() {
+async function loadSavedQuizes() {
     let quizes = [];
-    fetch('http://localhost:3000/allQuestions').then(data => data.json().then(response => {
+    await fetch(`${apiUrl}/allQuestions`).then(data => data.json().then(response => {
         quizes = response;
         quizes.forEach(element => {
             var listitem = document.createElement("div");
@@ -289,24 +293,19 @@ function loadSavedQuizes() {
         });
     }))
 }
-loadSavedQuizes();
-
-
-// hideAllSections();
-var currentQuize = {};
 function startQuizeByID(quizID) {
     hideAllSections();
     pincode = Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000;
+    currectQuizMetaData.pincode = pincode;
     document.getElementById("passcode").value = `passcode : ${pincode}`;
     socket.emit('connection', { passcode: pincode });
-    fetch(`http://localhost:3000/getQuestionsByID/${quizID}`,).then(data => data.json().then(response => {
+    fetch(`${apiUrl}/getQuestionsByID/${quizID}`,).then(data => data.json().then(response => {
         currentQuize = response;
         document.getElementById("startQuizTitle").innerHTML = response.data.title;
         document.getElementById("startQuizDescription").innerHTML = response.data.description;
         startedQuestionsListRender(response.data.questions);
     }))
 }
-
 function startedQuestionsListRender(questionslist) {
     hideAllSections();
     startedQuestionsListdiv.style.display = "block";
@@ -381,17 +380,10 @@ function startedQuestionsListRender(questionslist) {
         counter++;
     });
 }
-
-var contr = 0;
-var islastQuestion = false;
-var currectQuizMetaData = {};
 function sendQuestionToPlayers(questionNumber) {
     currentQuestionAnswers = [];
-    currectQuizMetaData = {
-        "title": currentQuize.title,
-        "description": currentQuize.description
-    }
-
+    currectQuizMetaData.pincode = pincode;
+    console.log(">>>>>",currectQuizMetaData);
     currectoption = currentQuize.data.questions[questionNumber].answer;
     if (currentQuize.data.questions.length == contr + 1)
         islastQuestion = true;
@@ -403,8 +395,6 @@ function sendQuestionToPlayers(questionNumber) {
         calculateScores(currentQuestionAnswers, currectoption);
     });
 }
-
-var finalReport = []
 function calculateScores(arr, currectoption) {
     arr.forEach(element => {
         if (element.selectedoption == currectoption) {
@@ -443,33 +433,18 @@ function displayFinalReport(report) {
     document.getElementById("finalTogglebtn").click();
 }
 
-function saveReport() {
+ function saveReport() {
     var arr = finalReport.sort((a, b) => parseFloat(b.score) - parseFloat(a.score))
-    fetch(`${apiUrl}/SaveReport`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            "title": currectQuizMetaData.title,
-            "description": currectQuizMetaData.description,
-            "list": arr
-        }),
-    })
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then((data) => {
-            console.log('Server response:', data);
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+    var finalreportObject = {
+        pincode :currectQuizMetaData.pincode,
+        title: currectQuizMetaData.title+" game",
+        description: currectQuizMetaData.description+" desc",
+        list: arr
+    }
+    console.log("<<<<<<<",finalreportObject);
+    console.log(finalreportObject);
+    socket.emit("publishreport",finalreportObject);
 }
-
 function fillProgressBar(id, duration, callback) {
     var progressBar = document.getElementById(id);
     let startTime = null;
@@ -493,10 +468,16 @@ function fillProgressBar(id, duration, callback) {
     }
     requestAnimationFrame(step);
 }
+function appendPlayer(name) {
+    var div = document.getElementById("playersJoiningDetails");
+    var listiteam = document.createElement("div");
+    listiteam.classList = ["list-group-item"];
+    listiteam.innerHTML = `${name} joined game!`;
+    div.appendChild(listiteam);
+}
+loadSavedQuizes();
 
-var currentQuestionAnswers = [];
-var currectoption = "";
-
+// socket events
 socket.on('playerJoined', data => {
     appendPlayer(data.name);
     finalReport.push({
@@ -508,10 +489,3 @@ socket.on('answers', (data) => {
     currentQuestionAnswers.push(data);
 });
 
-function appendPlayer(name) {
-    var div = document.getElementById("playersJoiningDetails");
-    var listiteam = document.createElement("div");
-    listiteam.classList = ["list-group-item"];
-    listiteam.innerHTML = `${name} joined game!`;
-    div.appendChild(listiteam);
-}

@@ -1,26 +1,34 @@
 const express = require('express');
+const app = express();
 const multer = require('multer');
 const xlsx = require('xlsx');
-const path = require('path');
-const cors = require('cors');
 const fs = require('fs-extra');
 const bodyParser = require('body-parser');
-const app = express();
-const port = 3000;
 const uuid = require('uuid');
+const http = require('http');
+const socketIo = require('socket.io');
+const cors = require('cors');
+const server = http.createServer(app);
+const PORT = process.env.PORT || 8000;
 
 // Create a storage engine using multer
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 
-const io = require('socket.io')(8000, {
+const io = socketIo(server, {
     cors: {
-        origin: "*",
-        methods: ["GET", "POST"],
-        allowedHeaders: ["my-custom-header"],
-        credentials: true
-    }
+        origin: '*',
+        methods: ['GET', 'POST'],
+    },
+});
+
+
+app.use(cors());
+app.use(bodyParser.json());
+
+server.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
 
 let QuizeMasters = {};
@@ -48,16 +56,13 @@ io.on('connection', socket => {
         var master = QuizeMasters;
         io.to(master.Socket.id).emit("answers", details);
     });
+    socket.on('publishreport',(report)=>{
+        console.log(report);
+        saveReport(report);
+    });
 });
-const corsOptions = {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  };
-  const corsMiddleware = cors(corsOptions);
-app.use(corsMiddleware);
 
-app.use(bodyParser.json());
+
 // Handle file upload and conversion
 app.post('/upload', upload.single('file'), (req, res) => {
     if (!req.file) {
@@ -74,8 +79,6 @@ app.post('/upload', upload.single('file'), (req, res) => {
         res.status(500).send('Error converting Excel to JSON.');
     }
 });
-
-
 // Define a route for handling POST requests
 app.post('/addQuestion', (req, res) => {
     console.log(req.body);
@@ -105,7 +108,6 @@ app.post('/addQuestion', (req, res) => {
         });
     });
 });
-
 app.get('/allQuestions', (req, res) => {
     fs.readJson("data.json", (err, existingData) => {
         if (err && err.code !== 'ENOENT') {
@@ -115,7 +117,6 @@ app.get('/allQuestions', (req, res) => {
         res.send(existingData);
     });
 });
-
 app.get('/getQuestionsByID/:id', (req, res) => {
     fs.readJson("data.json", (err, existingData) => {
         if (err && err.code !== 'ENOENT') {
@@ -128,34 +129,30 @@ app.get('/getQuestionsByID/:id', (req, res) => {
         });
     });
 });
-app.post('/SaveReport', (req, res) => {
-    console.log(req.body);
-    if (!req.body) {
-        return res.status(400).json({ error: 'No JSON data provided' });
-    }
-    const jsonData = req.body;
-    const filePath = 'report.json';
-    fs.readJson(filePath, (err, existingData) => {
-        if (err && err.code !== 'ENOENT') {
-            console.error(err);
-            return res.status(500).json({ error: 'Failed to read JSON data' });
-        }
-        const responseData = {
-            timestamp: new Date().toISOString(),
-            ReportID: uuid.v4(),
-            data: jsonData,
-        };
-        const updatedData = existingData ? [...existingData, responseData] : [responseData];
-        fs.writeJson(filePath, updatedData, (err) => {
-            if (err) {
-                console.error(err);
-                return res.status(500).json({ error: 'Failed to save JSON data' });
-            }
-            res.status(200).json({ message: 'JSON data saved successfully' });
-        });
-    });
-});
 
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
-});
+
+function saveReport(report)
+{
+    try {
+        fs.readJson('reports.json', (err, existingData) => {
+            if (err && err.code !== 'ENOENT') {
+                console.error(err);
+            }
+            const responseData = {
+                timestamp: new Date().toISOString(),
+                ReportID: uuid.v4(),
+                data: report
+            };
+            const updatedData = existingData ? [...existingData, responseData] : [responseData];
+            fs.writeJson('reports.json', updatedData, (err) => {
+                if (err) {
+                    console.error(err);
+                }
+                console.log('JSON data saved successfully');
+            });
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+

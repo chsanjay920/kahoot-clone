@@ -1,4 +1,5 @@
-const socket = io('http://localhost:8000');
+const apiUrl = 'http://localhost:8000';
+const socket = io(apiUrl);
 
 var gamecode = document.getElementById("gamepin");
 var clientName = document.getElementById("username");
