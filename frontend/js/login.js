@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:8000';
+const apiUrl = 'https://kahoot-server.onrender.com';
 var login = document.getElementById('login');
 var signin = document.getElementById('register');
 

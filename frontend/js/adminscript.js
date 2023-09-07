@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:8000';
+const apiUrl = 'https://kahoot-server.onrender.com';
 const socket = io(apiUrl);
 const fileInput = document.getElementById('file-input');
 const questioslistdiv = document.getElementById("questionsList");
@@ -499,7 +499,7 @@ function displayReports()
 {
     hideAllSections();
     reportsDiv.style.display = "block";
-    fetch('http://localhost:8000/getreports').then(response=>response.json().then(data=>{
+    fetch(`${apiUrl}/getreports`).then(response=>response.json().then(data=>{
         const sortedArray = data.sort((a, b) => {
             return new Date(b.timestamp) - new Date(a.timestamp);
         });

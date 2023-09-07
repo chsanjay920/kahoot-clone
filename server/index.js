@@ -30,7 +30,7 @@ server.listen(PORT, () => {
 // web socket events
 io.on('connection', socket => {
     socket.on('sendQuestion', questiondata => {
-        console.log("question", questiondata);
+        // console.log("question", questiondata);
         io.in(`${questiondata.passcode}`).emit("getQuestion", questiondata.data);
     });
     socket.on('connection', (pincode) => {
@@ -39,11 +39,11 @@ io.on('connection', socket => {
             SocketID: socket.id,
             Socket: socket
         };
-        console.log("Admin Connected!");
+        // console.log("Admin Connected!");
     });
     socket.on('playerconnected', (playerdata) => {
         var master = QuizeMasters;
-        console.log("player connected!", playerdata);
+        // console.log("player connected!", playerdata);
         socket.join(`${playerdata.gamecode}`);
         io.to(master.Socket.id).emit("playerJoined", playerdata);
     });
@@ -53,7 +53,7 @@ io.on('connection', socket => {
     });
     socket.on('publishreport',(report)=>{
         // console.log(">>>>>>report");
-        console.log(report);
+        // console.log(report);
         io.to(`${report.pincode}`).emit("overAllResult",report);
         // saveReport(report);
     });
